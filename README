@@ -1,0 +1,61 @@
+Test the reverse proxy module for NaviServer: NaviServer version 4.99.20, revproxy version 0.14 via HTTP and HTTPS with different size files in one docker container and two.
+This test relies on another test set-up : https://github.com/gustafn/ns-revproxy-test
+
+The configuration uses docker to create two NaviServer containers:
+    - one that acts as the reverse proxy on ports 18090 and 48090 (https)
+    - one that acts as the backend target server on port 18091, this container also has an additional naviserver that is a reverse proxy on ports 18099 and 48099 (https)
+
+From the host one can make a request directly to the backend (18091) or to either reverse proxy.
+With this set-up one can test that the reverse proxy in the same container as the backend is able to receive large files and forward them to the backend without a problem, where as the reverse proxy server in its own container has problems forwarding files 1 MB and greater.
+Hopefully, this can help figure out why the combination of NaviServer RevProxy and Docker is having problems.
+
+To install this set-up:
+  - it is assumed that you already have a suitable system running docker, have curl installed, and have an ip address assigned that can be referenced.
+  - checkout this repository to a suitable location
+  - to test requests over https you need to provide a cert. Modify the following as needed
+    - /.env                         # (if you already have a cert somewhere on the host enter that path after the =)
+        CERTSPATH=
+    - /docker-compose.yml           # (there are two places to change, one in each container, simply uncomment if using the CERTSPATH env var)
+        # - ${CERTSPATH}:/web/certs:ro
+    - /etc/nsd-config-revproxy.tcl  # (replace the path with /web/certs/<yourcertname>.pem if using CERTSPATH env var)
+    - /etc/nsd-config-sc-revproxy.tcl
+        ns_param certificate /usr/local/ns/etc/server.pem
+  - Add your ip address for the host; change the <youripaddress> in five places
+    - /docker-compose.yml
+  - then execute the following
+  > cd <checkout location>/etc
+  > git clone https://github.com/gustafn/ns-revproxy-test.git
+  > cd ../
+  > docker-compose up -d
+  > docker exec -it rp_test_naviserver_be bash
+  > cd /web/etc/ns-revproxy-test
+  > make
+
+Logs for all three servers may be watched at <checkout location>/etc/nsd-config-backend.tcl, nsd-config-revproxy.tcl, nsd-config-sc-revproxy.tcl (-sc- means same container)
+
+To perform some tests, in another session window
+  > cd <checkout location>/etc/ns-revproxy-test
+  - now make requests for testing
+
+Direct backend requests:
+   curl -v -X POST -T 100KB http://<youripaddress>:18091/receiver.tcl
+   curl -v -X POST -T 1MB http://<youripaddress>:18091/receiver.tcl
+   curl -v -X POST -T 10MB http://<youripaddress>:18091/receiver.tcl
+
+Reverse proxy in the same container as the backend requests:
+   curl -v -X POST -H Expect: -T 100KB http://<youripaddress>:18099/receiver.tcl
+   curl -v -X POST -H Expect: -T 1MB http://<youripaddress>:18099/receiver.tcl
+   curl -v -X POST -H Expect: -T 10MB http://<youripaddress>:18099/receiver.tcl
+
+   curl -v -k -X POST -H Expect: -T 100KB https://<youripaddress>:48099/receiver.tcl
+   curl -v -k -X POST -H Expect: -T 1MB https://<youripaddress>:48099/receiver.tcl
+   curl -v -k -X POST -H Expect: -T 10MB https://<youripaddress>:48099/receiver.tcl
+
+Reverse proxy in its own container requests:
+   curl -v -X POST -H Expect: -T 100KB http://<youripaddress>:18090/receiver.tcl
+   curl -v -X POST -H Expect: -T 1MB http://<youripaddress>:18090/receiver.tcl
+   curl -v -X POST -H Expect: -T 10MB http://<youripaddress>:18090/receiver.tcl
+
+   curl -v -k -X POST -H Expect: -T 100KB https://<youripaddress>:48090/receiver.tcl
+   curl -v -k -X POST -H Expect: -T 1MB https://<youripaddress>:48090/receiver.tcl
+   curl -v -k -X POST -H Expect: -T 10MB https://<youripaddress>:48090/receiver.tcl
