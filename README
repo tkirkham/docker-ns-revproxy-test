@@ -13,15 +13,19 @@ To install this set-up:
   - it is assumed that you already have a suitable system running docker, have curl installed, and have an ip address assigned that can be referenced.
   - checkout this repository to a suitable location
   - to test requests over https you need to provide a cert. Modify the following as needed
-    - /.env                         # (if you already have a cert somewhere on the host enter that path after the =)
+    - /.env                         
+        # (if you already have a cert somewhere on the host enter that path after the =)
         CERTSPATH=
-    - /docker-compose.yml           # (there are two places to change, one in each container, simply uncomment if using the CERTSPATH env var)
+    - /docker-compose.yml           
+        # (there are two places to change, one in each container, simply uncomment if using the CERTSPATH env var)
         # - ${CERTSPATH}:/web/certs:ro
-    - /etc/nsd-config-revproxy.tcl  # (replace the path with /web/certs/<yourcertname>.pem if using CERTSPATH env var)
+    - /etc/nsd-config-revproxy.tcl  
     - /etc/nsd-config-sc-revproxy.tcl
+        # (replace the path with /web/certs/<yourcertname>.pem if using CERTSPATH env var)
         ns_param certificate /usr/local/ns/etc/server.pem
   - Add your ip address for the host; change the <youripaddress> in five places
     - /docker-compose.yml
+    
   - then execute the following
   > cd <checkout location>/etc
   > git clone https://github.com/gustafn/ns-revproxy-test.git
