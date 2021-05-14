@@ -6,7 +6,8 @@ The configuration uses docker to create two NaviServer containers:
     - one that acts as the backend target server on port 18091, this container also has an additional naviserver that is a reverse proxy on ports 18099 and 48099 (https)
 
 From the host one can make a request directly to the backend (18091) or to either reverse proxy.
-With this set-up one can test that the reverse proxy in the same container as the backend is able to receive large files and forward them to the backend without a problem, where as the reverse proxy server in its own container has problems forwarding files 1 MB and greater.
+With this set-up one can test that the reverse proxy in the same container as the backend is able to receive large files and forward them to the backend without a problem, 
+where as the reverse proxy server in its own container has problems forwarding files 1 MB and greater.
 Hopefully, this can help figure out why the combination of NaviServer RevProxy and Docker is having problems.
 
 To install this set-up:
