@@ -8,7 +8,7 @@ The configuration uses docker to create two NaviServer containers:
 From the host one can make a request directly to the backend (18091) or to either reverse proxy.
 With this set-up one can test that the reverse proxy in the same container as the backend is able to receive large files and forward them to the backend without a problem, 
 where as the reverse proxy server in its own container has problems forwarding files 1 MB and greater.
-Hopefully, this can help figure out why the combination of NaviServer RevProxy and Docker is having problems.
+Hopefully, this can help figure out why the combination of NaviServer, revproxy, and Docker is having problems.
 
 To install this set-up:
   - it is assumed that you already have a suitable system running docker, have curl installed, and have an ip address assigned that can be referenced.
