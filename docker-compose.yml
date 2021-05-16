@@ -9,15 +9,14 @@ services:
         volumes:
             - ./etc:/web/etc
             - ./logs:/web/logs
-            # - ${CERTSPATH}:/web/certs:ro
+            - ${CERTSPATH}:/web/certs:ro
             - /var/run/docker.sock:/var/run/docker.sock
         ports:
-            - <youripaddress>:18090:18090
-            - <youripaddress>:48090:48090
+            - 127.0.0.1:18090:18090
+            - 127.0.0.1:48090:48090
         environment:
             - TZ=America/Denver
         networks:
-            - services
             - default
     naviserver_be:
         image: logansw/naviserver:v1.8
@@ -28,22 +27,18 @@ services:
         volumes:
             - ./etc:/web/etc
             - ./logs:/web/logs
-            # - ${CERTSPATH}:/web/certs:ro
+            - ${CERTSPATH}:/web/certs:ro
             - /var/run/docker.sock:/var/run/docker.sock
         ports:
-            - <youripaddress>:18091:18091
-            - <youripaddress>:18099:18099
-            - <youripaddress>:48099:48099
+            - 127.0.0.1:18091:18091
+            - 127.0.0.1:18099:18099
+            - 127.0.0.1:48099:48099
         environment:
             - TZ=America/Denver
         networks:
-            - services
             - default
 
 networks:
-    services:
-        external:
-            name: east-services-network
     default:
         external:
-            name: tkirkham-network
+            name: rp-network
