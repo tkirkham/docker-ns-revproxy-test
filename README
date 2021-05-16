@@ -12,20 +12,20 @@ Hopefully, this can help figure out why the combination of NaviServer, revproxy,
 To install this set-up:
   - it is assumed that you already have a suitable system running docker, have curl installed, and have an ip address assigned that can be referenced.
   - checkout this repository to a suitable location
+  - Create a network for the containers to communicate with 'docker network create rp-network', or change rp-network to an existing docker network in /docker-compose.yml
   - to test requests over https you need to provide a cert. Modify the following as needed
-    - /.env                         
-        # (if you already have a cert somewhere on the host enter that path after the =)
-        CERTSPATH=
-    - /docker-compose.yml           
+    - /.env
+        # (if you already have a cert somewhere on the host and don't want to use the self-signed test cert, replace ./certs with the path containing your certfile)
+        CERTSPATH=./certs
+    - /docker-compose.yml
         # (there are two places to change, one in each container, simply uncomment if using the CERTSPATH env var)
         # - ${CERTSPATH}:/web/certs:ro
-    - /etc/nsd-config-revproxy.tcl  
+    - /etc/nsd-config-revproxy.tcl
     - /etc/nsd-config-sc-revproxy.tcl
-        # (replace the path with /web/certs/<yourcertname>.pem if using CERTSPATH env var)
-        ns_param certificate /usr/local/ns/etc/server.pem
-  - Add your ip address for the host; change the <youripaddress> in five places
+        # (If you are not using the supplied test cert, replace testcert.pem with the name of your cert file on the line with /web/certs/testcert.pem)
+  - If you need to use an IP other than localhost (127.0.0.1); change the it in five places.
     - /docker-compose.yml
-    
+
   - then execute the following
   > cd <checkout location>/etc
   > git clone https://github.com/gustafn/ns-revproxy-test.git
@@ -42,24 +42,24 @@ To perform some tests, in another session window
   - now make requests for testing
 
 Direct backend requests:
-   curl -v -X POST -T 100KB http://<youripaddress>:18091/receiver.tcl
-   curl -v -X POST -T 1MB http://<youripaddress>:18091/receiver.tcl
-   curl -v -X POST -T 10MB http://<youripaddress>:18091/receiver.tcl
+   curl -v -X POST -T 100KB http://localhost:18091/receiver.tcl
+   curl -v -X POST -T 1MB http://localhost:18091/receiver.tcl
+   curl -v -X POST -T 10MB http://localhost:18091/receiver.tcl
 
 Reverse proxy in the same container as the backend requests:
-   curl -v -X POST -H Expect: -T 100KB http://<youripaddress>:18099/receiver.tcl
-   curl -v -X POST -H Expect: -T 1MB http://<youripaddress>:18099/receiver.tcl
-   curl -v -X POST -H Expect: -T 10MB http://<youripaddress>:18099/receiver.tcl
+   curl -v -X POST -H Expect: -T 100KB http://localhost:18099/receiver.tcl
+   curl -v -X POST -H Expect: -T 1MB http://localhost:18099/receiver.tcl
+   curl -v -X POST -H Expect: -T 10MB http://localhost:18099/receiver.tcl
 
-   curl -v -k -X POST -H Expect: -T 100KB https://<youripaddress>:48099/receiver.tcl
-   curl -v -k -X POST -H Expect: -T 1MB https://<youripaddress>:48099/receiver.tcl
-   curl -v -k -X POST -H Expect: -T 10MB https://<youripaddress>:48099/receiver.tcl
+   curl -v -k -X POST -H Expect: -T 100KB https://localhost:48099/receiver.tcl
+   curl -v -k -X POST -H Expect: -T 1MB https://localhost:48099/receiver.tcl
+   curl -v -k -X POST -H Expect: -T 10MB https://localhost:48099/receiver.tcl
 
 Reverse proxy in its own container requests:
-   curl -v -X POST -H Expect: -T 100KB http://<youripaddress>:18090/receiver.tcl
-   curl -v -X POST -H Expect: -T 1MB http://<youripaddress>:18090/receiver.tcl
-   curl -v -X POST -H Expect: -T 10MB http://<youripaddress>:18090/receiver.tcl
+   curl -v -X POST -H Expect: -T 100KB http://localhost:18090/receiver.tcl
+   curl -v -X POST -H Expect: -T 1MB http://localhost:18090/receiver.tcl
+   curl -v -X POST -H Expect: -T 10MB http://localhost:18090/receiver.tcl
 
-   curl -v -k -X POST -H Expect: -T 100KB https://<youripaddress>:48090/receiver.tcl
-   curl -v -k -X POST -H Expect: -T 1MB https://<youripaddress>:48090/receiver.tcl
-   curl -v -k -X POST -H Expect: -T 10MB https://<youripaddress>:48090/receiver.tcl
+   curl -v -k -X POST -H Expect: -T 100KB https://localhost:48090/receiver.tcl
+   curl -v -k -X POST -H Expect: -T 1MB https://localhost:48090/receiver.tcl
+   curl -v -k -X POST -H Expect: -T 10MB https://localhost:48090/receiver.tcl
