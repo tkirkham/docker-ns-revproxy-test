@@ -1,5 +1,5 @@
 Test the reverse proxy module for NaviServer: NaviServer version 4.99.20, revproxy version 0.14 via HTTP and HTTPS with different size files in one docker container and two.
-This test relies on another test set-up : https://github.com/gustafn/ns-revproxy-test
+This test is based on another test set-up : https://github.com/gustafn/ns-revproxy-test
 
 The configuration uses docker to create two NaviServer containers:
     - one that acts as the reverse proxy on ports 18090 and 48090 (https)
